@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Fitness Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --surface: #101010;
+  --surface2: #181818;
+  --surface3: #202020;
+  --accent: #00d4ff;
+  --accent2: #ff4d00;
+  --accent3: #e8ff00;
+  --green: #4ade80;
+  --blue: #60a5fa;
+  --orange: #fb923c;
+  --red: #f87171;
+  --purple: #c084fc;
+  --text: #efefef;
+  --muted: #555;
+  --muted2: #777;
+  --border: #1e1e1e;
+  --border2: #2a2a2a;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; font-size:13.5px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+.header { background:var(--surface); border-bottom:1px solid var(--border); padding:36px 24px 28px; position:relative; overflow:hidden; }
+.header::after { content:'CLIENT'; position:absolute; right:-10px; top:-10px; font-family:'Bebas Neue',sans-serif; font-size:120px; color:var(--accent); opacity:0.03; pointer-events:none; letter-spacing:-2px; }
+.header-label { font-family:'DM Mono',monospace; font-size:10px; color:var(--accent); letter-spacing:4px; text-transform:uppercase; margin-bottom:10px; }
+.header h1 { font-family:'Bebas Neue',sans-serif; font-size:52px; letter-spacing:3px; line-height:0.9; }
+.header h1 span { color:var(--accent); }
+.stats-row { display:flex; gap:10px; margin-top:22px; flex-wrap:wrap; }
+.stat { background:var(--surface2); border:1px solid var(--border2); padding:8px 14px; border-radius:4px; }
+.stat-label { font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; }
+.stat-value { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--accent); letter-spacing:1px; line-height:1.2; }
+.nav { display:flex; border-bottom:1px solid var(--border); background:var(--surface); overflow-x:auto; position:sticky; top:0; z-index:100; scrollbar-width:none; }
+.nav::-webkit-scrollbar { display:none; }
+.nav-btn { padding:13px 14px; background:none; border:none; color:var(--muted); font-family:'DM Mono',monospace; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent; transition:all 0.15s; flex-shrink:0; }
+.nav-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+.nav-btn:hover:not(.active) { color:var(--text); }
+.content { padding:20px; max-width:780px; }
+.section { display:none; }
+.section.active { display:block; }
+.sec-head { margin-bottom:20px; }
+.sec-title { font-family:'Bebas Neue',sans-serif; font-size:34px; letter-spacing:2px; line-height:1; }
+.sec-sub { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:1px; margin-top:4px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:6px; margin-bottom:14px; overflow:hidden; }
+.card-head { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:var(--surface2); border-bottom:1px solid var(--border); gap:10px; }
+.card-title { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:1px; flex:1; }
+.card-body { padding:14px 16px; }
+.badge { font-family:'DM Mono',monospace; font-size:10px; padding:3px 9px; border-radius:3px; white-space:nowrap; }
+.badge-accent { color:var(--accent); background:rgba(0,212,255,0.07); border:1px solid rgba(0,212,255,0.2); }
+.badge-red { color:var(--accent2); background:rgba(255,77,0,0.07); border:1px solid rgba(255,77,0,0.2); }
+.badge-yellow { color:var(--accent3); background:rgba(232,255,0,0.07); border:1px solid rgba(232,255,0,0.2); }
+.badge-green { color:var(--green); background:rgba(74,222,128,0.07); border:1px solid rgba(74,222,128,0.2); }
+.badge-purple { color:var(--purple); background:rgba(192,132,252,0.07); border:1px solid rgba(192,132,252,0.2); }
+table { width:100%; border-collapse:collapse; margin-bottom:12px; }
+th { font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; text-align:left; padding:6px 0; border-bottom:1px solid var(--border2); }
+td { padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.03); font-size:13px; color:var(--text); vertical-align:middle; }
+td.right { text-align:right; color:var(--muted2); font-family:'DM Mono',monospace; font-size:11px; }
+td.center { text-align:center; }
+.sets-pill { display:inline-block; font-family:'DM Mono',monospace; font-size:10px; background:var(--surface3); border:1px solid var(--border2); padding:2px 7px; border-radius:3px; color:var(--muted2); }
+.macro-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.chip { font-family:'DM Mono',monospace; font-size:10px; padding:3px 9px; border-radius:3px; border:1px solid var(--border2); }
+.chip-p { border-color:rgba(74,222,128,0.4); color:var(--green); background:rgba(74,222,128,0.06); }
+.chip-c { border-color:rgba(96,165,250,0.4); color:var(--blue); background:rgba(96,165,250,0.06); }
+.chip-f { border-color:rgba(251,146,60,0.4); color:var(--orange); background:rgba(251,146,60,0.06); }
+.chip-k { border-color:rgba(232,255,0,0.4); color:var(--accent3); background:rgba(232,255,0,0.06); }
+.totals-card { background:var(--surface2); border:1px solid rgba(0,212,255,0.25); border-radius:6px; padding:18px; margin-top:6px; }
+.totals-title { font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:2px; color:var(--accent); margin-bottom:14px; }
+.totals-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.total-item { text-align:center; }
+.total-val { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:1px; display:block; line-height:1; }
+.total-val.p { color:var(--green); }
+.total-val.c { color:var(--blue); }
+.total-val.f { color:var(--orange); }
+.total-val.k { color:var(--accent3); }
+.total-label { font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-top:3px; }
+.note { border-radius:0 4px 4px 0; padding:10px 14px; margin:10px 0; font-size:12.5px; line-height:1.6; }
+.note strong { color:var(--text); }
+.note-b { background:rgba(0,212,255,0.04); border-left:3px solid var(--accent); color:#aaa; }
+.note-r { background:rgba(255,77,0,0.04); border-left:3px solid var(--accent2); color:#aaa; }
+.note-y { background:rgba(232,255,0,0.04); border-left:3px solid var(--accent3); color:#aaa; }
+.note-g { background:rgba(74,222,128,0.04); border-left:3px solid var(--green); color:#aaa; }
+.note-p { background:rgba(192,132,252,0.04); border-left:3px solid var(--purple); color:#aaa; }
+.sched-row { display:flex; align-items:flex-start; gap:16px; padding:10px 0; border-bottom:1px solid var(--border); }
+.sched-row:last-child { border-bottom:none; }
+.sched-time { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--accent); min-width:80px; letter-spacing:1px; line-height:1.2; }
+.sched-info { flex:1; }
+.sched-main { font-size:13px; color:var(--text); }
+.sched-detail { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); margin-top:2px; }
+.timeline { position:relative; padding-left:28px; }
+.timeline::before { content:''; position:absolute; left:8px; top:0; bottom:0; width:1px; background:linear-gradient(to bottom,var(--accent),var(--accent2),transparent); opacity:0.3; }
+.tl-item { position:relative; margin-bottom:20px; }
+.tl-dot { position:absolute; left:-24px; top:4px; width:10px; height:10px; border-radius:50%; background:var(--accent); border:2px solid var(--bg); }
+.tl-month { font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:1px; color:var(--accent); margin-bottom:4px; }
+.tl-text { font-size:13px; color:var(--muted2); line-height:1.6; }
+.tl-text strong { color:var(--text); }
+.rules-grid { display:grid; gap:10px; }
+.rule-item { background:var(--surface); border:1px solid var(--border); border-radius:5px; padding:12px 14px; display:flex; gap:12px; align-items:flex-start; }
+.rule-num { font-family:'Bebas Neue',sans-serif; font-size:26px; color:var(--accent); line-height:1; min-width:24px; }
+.rule-content { flex:1; }
+.rule-title { font-family:'DM Mono',monospace; font-size:11px; color:var(--text); letter-spacing:0.5px; margin-bottom:3px; }
+.rule-desc { font-size:12.5px; color:var(--muted2); line-height:1.5; }
+.flag-item { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent2); border-radius:0 5px 5px 0; padding:10px 14px; margin-bottom:8px; }
+.flag-title { font-family:'DM Mono',monospace; font-size:11px; color:var(--red); margin-bottom:3px; }
+.flag-desc { font-size:12.5px; color:var(--muted2); line-height:1.5; }
+.core-label { font-family:'DM Mono',monospace; font-size:9px; color:var(--accent); text-transform:uppercase; letter-spacing:2.5px; margin:14px 0 8px; }
+.cardio-note { background:rgba(0,212,255,0.04); border:1px solid rgba(0,212,255,0.12); border-radius:4px; padding:8px 12px; font-family:'DM Mono',monospace; font-size:10px; color:var(--accent); margin-top:12px; }
+.supp-yes { color:var(--green); font-family:'DM Mono',monospace; font-size:11px; }
+.supp-no { color:var(--red); font-family:'DM Mono',monospace; font-size:11px; }
+.phase-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; }
+.phase-card { background:var(--surface2); border:1px solid var(--border2); border-radius:5px; padding:14px; text-align:center; }
+.phase-num { font-family:'Bebas Neue',sans-serif; font-size:32px; color:var(--accent); line-height:1; }
+.phase-name { font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin:4px 0; }
+.phase-detail { font-size:12px; color:var(--muted2); }
+.warning-box { background:rgba(255,77,0,0.06); border:1px solid rgba(255,77,0,0.3); border-radius:6px; padding:16px; margin-bottom:14px; }
+.warning-title { font-family:'Bebas Neue',sans-serif; font-size:18px; color:var(--accent2); letter-spacing:1px; margin-bottom:10px; }
+.tip-card { background:var(--surface); border:1px solid var(--border); border-radius:5px; padding:14px 16px; margin-bottom:10px; display:flex; gap:14px; align-items:flex-start; }
+.tip-icon { font-size:22px; min-width:28px; line-height:1.2; }
+.tip-content { flex:1; }
+.tip-title { font-family:'DM Mono',monospace; font-size:11px; color:var(--accent); letter-spacing:0.5px; margin-bottom:4px; }
+.tip-desc { font-size:12.5px; color:var(--muted2); line-height:1.6; }
+.tip-desc strong { color:var(--text); }
+.decision-tree { display:grid; gap:10px; }
+.dt-item { background:var(--surface); border:1px solid var(--border); border-radius:5px; padding:12px 16px; display:flex; gap:12px; align-items:flex-start; }
+.dt-icon { font-family:'Bebas Neue',sans-serif; font-size:22px; min-width:32px; line-height:1; }
+.dt-content { flex:1; }
+.dt-cond { font-family:'DM Mono',monospace; font-size:11px; color:var(--accent3); letter-spacing:0.5px; margin-bottom:3px; }
+.dt-action { font-size:12.5px; color:var(--muted2); }
+.dt-action strong { color:var(--text); }
+.track-grid { display:grid; gap:8px; }
+.track-item { background:var(--surface); border:1px solid var(--border); border-radius:5px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; }
+.track-label { font-size:13px; color:var(--text); }
+.track-target { font-family:'DM Mono',monospace; font-size:10px; color:var(--accent); background:rgba(0,212,255,0.07); border:1px solid rgba(0,212,255,0.2); padding:3px 8px; border-radius:3px; }
+.sleep-step { display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid var(--border); }
+.sleep-step:last-child { border-bottom:none; }
+.sleep-week { font-family:'Bebas Neue',sans-serif; font-size:16px; color:var(--accent); min-width:70px; }
+.sleep-time { font-family:'DM Mono',monospace; font-size:12px; color:var(--text); }
+.sleep-note { font-size:11px; color:var(--muted); margin-left:auto; }
+@media (max-width:480px) {
+  .header h1 { font-size:38px; }
+  .totals-grid { grid-template-columns:repeat(2,1fr); }
+  .phase-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Long-Term Transformation Plan</div>
+  <h1>CLIENT<br><span>PLAN</span></h1>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-label">Age</div><div class="stat-value">16</div></div>
+    <div class="stat"><div class="stat-label">Weight</div><div class="stat-value">115kg</div></div>
+    <div class="stat"><div class="stat-label">Height</div><div class="stat-value">178cm</div></div>
+    <div class="stat"><div class="stat-label">Target</div><div class="stat-value">85kg</div></div>
+    <div class="stat"><div class="stat-label">Start Calories</div><div class="stat-value">2500</div></div>
+    <div class="stat"><div class="stat-label">Protein</div><div class="stat-value">150g</div></div>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="show('overview',this)">Overview</button>
+  <button class="nav-btn" onclick="show('schedule',this)">Schedule</button>
+  <button class="nav-btn" onclick="show('meals',this)">Meals</button>
+  <button class="nav-btn" onclick="show('workout',this)">Workout</button>
+  <button class="nav-btn" onclick="show('training',this)">Training Tips</button>
+  <button class="nav-btn" onclick="show('milestones',this)">Milestones</button>
+  <button class="nav-btn" onclick="show('tracking',this)">Tracking</button>
+  <button class="nav-btn" onclick="show('plateau',this)">Plateau</button>
+  <button class="nav-btn" onclick="show('supplements',this)">Supplements</button>
+  <button class="nav-btn" onclick="show('rules',this)">Rules</button>
+  <button class="nav-btn" onclick="show('coachnotes',this)">Coach Notes</button>
+</nav>
+
+<div class="content">
+
+<!-- OVERVIEW -->
+<div id="overview" class="section active">
+  <div class="sec-head">
+    <div class="sec-title">Overview</div>
+    <div class="sec-sub">Strategy · Health Flags · Phase Structure</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">The Strategy</div><div class="badge badge-accent">Long Term</div></div>
+    <div class="card-body">
+      <p style="color:var(--muted2);font-size:13px;line-height:1.7;margin-bottom:12px">Age 16, 115kg, 178cm. Estimated BF ~38–42%. Long term plan — fat loss first, then recomposition. Conservative, sustainable, habit formation first. Calories start at 2500 and adjust every 2–3 weeks based on actual scale data — not calculators.</p>
+      <div class="note note-r"><strong>Calories are not fixed.</strong> 2500 is the starting point. Real progress data adjusts them. Track 7-day average weight every 2 weeks and adjust from there.</div>
+      <div class="note note-y"><strong>Push/Pull/Legs split with active rest days.</strong> Monday Push, Tuesday Pull, Wednesday Active Rest, Thursday Push, Friday Pull, Saturday Legs, Sunday Active Rest. Steps progress from 10k to 18k over 7 weeks.</div>
+      <div class="note note-g"><strong>Habits before perfection.</strong> Eating protein 3x daily and stopping meal skipping is more important right now than perfect timing or exact macros.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Phase Structure</div><div class="badge badge-accent">3 Phases</div></div>
+    <div class="card-body">
+      <div class="phase-grid">
+        <div class="phase-card"><div class="phase-num">1</div><div class="phase-name">Fat Loss</div><div class="phase-detail">9–14 months<br>115kg → 85kg</div></div>
+        <div class="phase-card"><div class="phase-num">2</div><div class="phase-name">Recomposition</div><div class="phase-detail">6–8 months<br>Build muscle · Get lean</div></div>
+        <div class="phase-card"><div class="phase-num">3</div><div class="phase-name">Aesthetic</div><div class="phase-detail">Ongoing<br>Maintain · Refine</div></div>
+      </div>
+      <div class="note note-b" style="margin-bottom:0"><strong>Do not rush Phase 1.</strong> 30kg of fat loss done properly takes time. The aesthetic physique is a Phase 2 and 3 goal.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Daily Targets</div><div class="badge badge-yellow">Starting Point</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Metric</th><th style="text-align:right">Target</th></tr>
+        <tr><td>Calories</td><td class="right">2500 kcal (adjust every 2–3 weeks)</td></tr>
+        <tr><td>Protein</td><td class="right">150g daily</td></tr>
+        <tr><td>Carbs</td><td class="right">Fill remaining calories after protein and fat</td></tr>
+        <tr><td>Fat</td><td class="right">55–65g</td></tr>
+        <tr><td>Fibre</td><td class="right">30–40g daily</td></tr>
+        <tr><td>Water</td><td class="right">4–5 litres daily</td></tr>
+        <tr><td>Steps</td><td class="right">8,000–10,000 daily (progressive)</td></tr>
+        <tr><td>Sleep</td><td class="right">7–8 hours (gradual shift from 2AM)</td></tr>
+      </table>
+      <div class="note note-b" style="margin-bottom:0"><strong>Why 2500 not 1900:</strong> Maintenance at 115kg is ~2800–3000 kcal. A 500 kcal deficit is sufficient and sustainable. Aggressive deficits at 16 risk muscle loss, hormonal disruption, and poor adherence.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SCHEDULE -->
+<div id="schedule" class="section">
+  <div class="sec-head">
+    <div class="sec-title">Daily Schedule</div>
+    <div class="sec-sub">Built around his existing routine</div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="sched-row">
+        <div class="sched-time">7:30</div>
+        <div class="sched-info"><div class="sched-main">Wake up</div><div class="sched-detail">500ml water immediately on empty stomach</div></div>
+      </div>
+      <div class="sched-row">
+        <div class="sched-time">7:45</div>
+        <div class="sched-info"><div class="sched-main">Meal 1 — Breakfast</div><div class="sched-detail">4 eggs + oats + milk + fruit. Non-negotiable — no skipping.</div></div>
+      </div>
+      <div class="sched-row">
+        <div class="sched-time">8:00</div>
+        <div class="sched-info"><div class="sched-main">Tuitions</div><div class="sched-detail">Black coffee or green tea only — no cold coffee with sugar</div></div>
+      </div>
+      <div class="sched-row">
+        <div class="sched-time">12:30</div>
+        <div class="sched-info"><div class="sched-main">Meal 2 — Lunch</div><div class="sched-detail">Chicken + rice + dal + curd. Do not skip this meal.</div></div>
+      </div>
+      <div class="sched-row">
+        <div class="sched-time">7:30</div>
+        <div class="sched-info"><div class="sched-main">Gym</div><div class="sched-detail">Lift 45–55 min → incline treadmill after (see cardio progression)</div></div>
+      </div>
+      <div class="sched-row">
+        <div class="sched-time">9:30</div>
+        <div class="sched-info"><div class="sched-main">Meal 3 — Post-workout dinner</div><div class="sched-detail">Chicken + eggs + vegetables + curd. Light — no rice at night.</div></div>
+      </div>
+      <div class="sched-row">
+        <div class="sched-time">11:30</div>
+        <div class="sched-info"><div class="sched-main">Night study cutoff</div><div class="sched-detail">Stop by 11:30 PM maximum. Wind down, no screens.</div></div>
+      </div>
+      <div class="sched-row">
+        <div class="sched-time">12:00</div>
+        <div class="sched-info"><div class="sched-main">Sleep target (gradual)</div><div class="sched-detail">Currently 2AM. Move back 15 minutes every week. See sleep plan below.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Sleep Transition Plan</div><div class="badge badge-purple">Gradual · 15 Min/Week</div></div>
+    <div class="card-body">
+      <p style="color:var(--muted2);font-size:12.5px;margin-bottom:12px">Currently sleeping at 2:00 AM. Moving directly to 12:00 AM will not work — adjust gradually by 15 minutes per week.</p>
+      <div class="sleep-step"><div class="sleep-week">Week 1</div><div class="sleep-time">1:45 AM</div><div class="sleep-note">Start here</div></div>
+      <div class="sleep-step"><div class="sleep-week">Week 2</div><div class="sleep-time">1:30 AM</div><div class="sleep-note"></div></div>
+      <div class="sleep-step"><div class="sleep-week">Week 3</div><div class="sleep-time">1:15 AM</div><div class="sleep-note"></div></div>
+      <div class="sleep-step"><div class="sleep-week">Week 4</div><div class="sleep-time">1:00 AM</div><div class="sleep-note"></div></div>
+      <div class="sleep-step"><div class="sleep-week">Week 5</div><div class="sleep-time">12:45 AM</div><div class="sleep-note"></div></div>
+      <div class="sleep-step"><div class="sleep-week">Week 6</div><div class="sleep-time">12:30 AM</div><div class="sleep-note"></div></div>
+      <div class="sleep-step"><div class="sleep-week">Week 7</div><div class="sleep-time">12:15 AM</div><div class="sleep-note"></div></div>
+      <div class="sleep-step"><div class="sleep-week">Week 8+</div><div class="sleep-time">12:00 AM</div><div class="sleep-note">Target · Hold here</div></div>
+      <div class="note note-r" style="margin-bottom:0"><strong>Why this matters at 16:</strong> Growth hormone is released during deep sleep. Sleep deprivation raises cortisol, causes fat storage, and directly slows fat loss. Non-negotiable for his age and goals.</div>
+    </div>
+  </div>
+
+  <div class="note note-y"><strong>Priority habit:</strong> Stop skipping breakfast and lunch. Eating protein 3x per day consistently is more important than perfect timing or perfect macros in the first 4 weeks.</div>
+</div>
+
+<!-- MEALS -->
+<div id="meals" class="section">
+  <div class="sec-head">
+    <div class="sec-title">Meal Plan</div>
+    <div class="sec-sub">3 meals · ~2500 kcal · 150–170g protein</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Meal 1 — Breakfast</div><div class="badge badge-accent">7:45 AM</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Food</th><th>Amount</th><th style="text-align:right">Protein</th></tr>
+        <tr><td>Whole eggs</td><td>2</td><td class="right">~14g</td></tr>
+        <tr><td>Egg whites</td><td>6</td><td class="right">~21g</td></tr>
+        <tr><td>Oats (dry weight)</td><td>80g</td><td class="right">~10g</td></tr>
+        <tr><td>Milk (full fat)</td><td>200ml</td><td class="right">~7g</td></tr>
+        <tr><td>Apple</td><td>1</td><td class="right">~0g</td></tr>
+        <tr><td>Butter</td><td>1 tbsp</td><td class="right">~0g</td></tr>
+      </table>
+      <div class="macro-row">
+        <div class="chip chip-p">P ~52g</div><div class="chip chip-c">C ~82g</div>
+        <div class="chip chip-f">F ~31g</div><div class="chip chip-k">~832 kcal</div>
+      </div>
+      <div class="note note-b" style="margin-top:10px;margin-bottom:0">Add 1 tbsp chia seeds to oats (+~60 kcal, +4g fibre, +3g protein). Black coffee with a dash of milk during tuitions — no sugar. Cook eggs dry on non-stick.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Meal 2 — Lunch</div><div class="badge badge-accent">12:30 PM</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Food</th><th>Amount</th><th style="text-align:right">Protein</th></tr>
+        <tr><td>Chicken breast (cooked)</td><td>200g</td><td class="right">~44g</td></tr>
+        <tr><td>Rice (cooked)</td><td>200g</td><td class="right">~5g</td></tr>
+        <tr><td>Curd (full fat)</td><td>100g</td><td class="right">~4g</td></tr>
+        <tr><td>Ghee</td><td>1 tbsp</td><td class="right">~0g</td></tr>
+        <tr><td>Butter</td><td>1 tbsp</td><td class="right">~0g</td></tr>
+        <tr><td>Vegetables (cucumber/tomato/spinach)</td><td>150g</td><td class="right">~3g</td></tr>
+      </table>
+      <div class="macro-row">
+        <div class="chip chip-p">P ~61g</div><div class="chip chip-c">C ~88g</div>
+        <div class="chip chip-f">F ~37g</div><div class="chip chip-k">~952 kcal</div>
+      </div>
+      <div class="note note-y" style="margin-top:10px;margin-bottom:0">Vegetables add fibre, potassium, and micronutrients. Aim for 150–200g vegetables with this meal every day.</div>
+    </div>
+  </div>
+
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Pre-Workout Snack</div><div class="badge badge-accent">6:00 PM</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Food</th><th>Amount</th><th style="text-align:right">Protein</th></tr>
+        <tr><td>Banana</td><td>1</td><td class="right">~1g</td></tr>
+        <tr><td>Black coffee</td><td>1 cup</td><td class="right">~0g</td></tr>
+      </table>
+      <div class="macro-row">
+        <div class="chip chip-p">P ~1g</div><div class="chip chip-c">C ~23g</div>
+        <div class="chip chip-f">F ~0g</div><div class="chip chip-k">~90 kcal</div>
+      </div>
+      <div class="note note-b" style="margin-bottom:0">Fast carbs before training fuel the session. Black coffee 30–45 min before gym boosts focus and performance. No sugar in coffee.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Meal 3 — Post-workout Dinner</div><div class="badge badge-accent">9:30 PM</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Food</th><th>Amount</th><th style="text-align:right">Protein</th></tr>
+        <tr><td>Chicken breast (cooked)</td><td>150g</td><td class="right">~33g</td></tr>
+        <tr><td>Spinach (if fibre needed)</td><td>150g</td><td class="right">~4g</td></tr>
+        <tr><td>Rice (cooked)</td><td>200g</td><td class="right">~5g</td></tr>
+        <tr><td>Butter</td><td>1 tbsp</td><td class="right">~0g</td></tr>
+      </table>
+      <div class="macro-row">
+        <div class="chip chip-p">P ~55g</div><div class="chip chip-c">C ~195g</div>
+        <div class="chip chip-f">F ~16g</div><div class="chip chip-k">~1150 kcal</div>
+      </div>
+      <div class="note note-b" style="margin-top:10px;margin-bottom:0">Rice added at dinner for recovery. Butter adds healthy fat and calories to hit the 2500–2800 target.</div>
+    </div>
+  </div>
+
+  <div class="totals-card">
+    <div class="totals-title">Daily Totals</div>
+    <div class="totals-grid">
+      <div class="total-item"><span class="total-val p">~168g</span><div class="total-label">Protein</div></div>
+      <div class="total-item"><span class="total-val c">~346g</span><div class="total-label">Carbs</div></div>
+      <div class="total-item"><span class="total-val f">~89g</span><div class="total-label">Fat</div></div>
+      <div class="total-item"><span class="total-val k">~2792</span><div class="total-label">Kcal</div></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="card-head"><div class="card-title">Fibre & Micronutrient Goals</div><div class="badge badge-green">Daily</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Goal</th><th style="text-align:right">Target</th></tr>
+        <tr><td>Fibre</td><td class="right">30–40g daily</td></tr>
+        <tr><td>Vegetables</td><td class="right">400–600g daily</td></tr>
+        <tr><td>Fruit</td><td class="right">2 pieces daily</td></tr>
+        <tr><td>Dal or legumes</td><td class="right">1 serving daily</td></tr>
+        <tr><td>Dairy (curd/milk)</td><td class="right">300–400ml daily</td></tr>
+        <tr><td>Potassium-rich foods</td><td class="right">Banana · potato · spinach · beans · curd daily</td></tr>
+      </table>
+      <div class="note note-g" style="margin-bottom:0">Fibre is especially important given obesity and diabetes family history — it slows glucose absorption, increases satiety, and supports gut health. Oats, dal, vegetables, and fruits all contribute.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="card-head"><div class="card-title">Tuesday — Full Vegetarian Day</div><div class="badge badge-green">Full Veg</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Replace Chicken With</th><th>Amount</th><th style="text-align:right">Protein</th></tr>
+        <tr><td>Soya chunks (dry weight)</td><td>80g</td><td class="right">~42g</td></tr>
+        <tr><td>Paneer (low fat)</td><td>150g</td><td class="right">~21g</td></tr>
+        <tr><td>Dal</td><td>150g</td><td class="right">~14g</td></tr>
+        <tr><td>Curd</td><td>200g</td><td class="right">~8g</td></tr>
+      </table>
+      <div class="note note-b" style="margin-bottom:0">No eggs on Tuesdays. Add 1 scoop whey post-workout if protein falls short of target. Soya chunks are the main protein source.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="card-head"><div class="card-title">Remove Immediately</div><div class="badge badge-red">Stop Now</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Item</th><th style="text-align:right">Why</th></tr>
+        <tr><td>Cold coffee with sugar</td><td class="right">Liquid sugar · Insulin spike · Diabetes risk</td></tr>
+        <tr><td>Skipping breakfast and lunch</td><td class="right">Causes overeating at dinner · Disrupts blood sugar</td></tr>
+        <tr><td>Heavy dinner as only meal</td><td class="right">Spikes insulin at night · Directly causes fat storage</td></tr>
+        <tr><td>Fried food · packaged snacks · sweets</td><td class="right">Empty calories · High diabetes risk for him specifically</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="card-head"><div class="card-title">💧 Water Intake</div><div class="badge badge-accent">4–5L Daily</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Time</th><th style="text-align:right">Amount</th></tr>
+        <tr><td>Wake up — empty stomach</td><td class="right">500ml</td></tr>
+        <tr><td>During tuitions</td><td class="right">500–750ml</td></tr>
+        <tr><td>Lunch</td><td class="right">250ml</td></tr>
+        <tr><td>Pre-gym</td><td class="right">500ml</td></tr>
+        <tr><td>During gym</td><td class="right">500–750ml</td></tr>
+        <tr><td>Post-gym</td><td class="right">500ml</td></tr>
+        <tr><td><strong>Total</strong></td><td class="right"><strong>~4 litres minimum</strong></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- WORKOUT -->
+<div id="workout" class="section">
+  <div class="sec-head">
+    <div class="sec-title">Training Plan</div>
+    <div class="sec-sub">6-Day Push / Pull / Legs · Active Rest Days</div>
+  </div>
+
+  <div class="note note-b" style="margin-bottom:14px"><strong>Every session:</strong> 5 min treadmill warmup before lifting. Rest 60 sec isolation, 90 sec compound. <strong>2–3 second controlled negative on every rep.</strong> Stop 1–3 reps short of failure on compounds, 0–2 on isolation.</div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Weekly Split</div><div class="badge badge-accent">6 Days</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Day</th><th style="text-align:right">Session</th></tr>
+        <tr><td>Monday</td><td class="right">Push — Chest Focus</td></tr>
+        <tr><td>Tuesday</td><td class="right">Pull</td></tr>
+        <tr><td>Wednesday</td><td class="right">Active Rest</td></tr>
+        <tr><td>Thursday</td><td class="right">Push — Shoulder Focus</td></tr>
+        <tr><td>Friday</td><td class="right">Pull</td></tr>
+        <tr><td>Saturday</td><td class="right">Legs</td></tr>
+        <tr><td>Sunday</td><td class="right">Active Rest</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Steps Progression</div><div class="badge badge-green">Every Day</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Period</th><th style="text-align:right">Daily Step Target</th></tr>
+        <tr><td>Week 1–2</td><td class="right">10,000 steps</td></tr>
+        <tr><td>Week 3–4</td><td class="right">12,000 steps</td></tr>
+        <tr><td>Week 5–6</td><td class="right">15,000 steps</td></tr>
+        <tr><td>Week 7+</td><td class="right">18,000 steps</td></tr>
+      </table>
+      <div class="note note-y" style="margin-bottom:0">Steps are cumulative across the full day — gym treadmill counts. Active rest days are where most steps are earned.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Monday — Push (Chest Focus)</div><div class="badge badge-red">Chest · Shoulders · Triceps</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Exercise</th><th style="text-align:center">Sets</th><th style="text-align:right">Reps</th></tr>
+        <tr><td>Barbell Bench Press</td><td class="center"><span class="sets-pill">3</span></td><td class="right">6–10</td></tr>
+        <tr><td>Incline DB Press</td><td class="center"><span class="sets-pill">3</span></td><td class="right">8–12</td></tr>
+        <tr><td>High to Low Fly (cable)</td><td class="center"><span class="sets-pill">3</span></td><td class="right">10–15</td></tr>
+        <tr><td>Lateral Raises (dumbbell)</td><td class="center"><span class="sets-pill">4</span></td><td class="right">12–15</td></tr>
+        <tr><td>Tricep Pushdown (cable)</td><td class="center"><span class="sets-pill">3</span></td><td class="right">12–15</td></tr>
+        <tr><td>Overhead Tricep Extension</td><td class="center"><span class="sets-pill">3</span></td><td class="right">10–12</td></tr>
+      </table>
+      <div class="core-label">Core</div>
+      <table><tr><td>Lying Crunches</td><td class="center"><span class="sets-pill">3</span></td><td class="right">10–15</td></tr></table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Tuesday — Pull</div><div class="badge badge-blue">Back · Biceps · Rear Delts</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Exercise</th><th style="text-align:center">Sets</th><th style="text-align:right">Reps</th></tr>
+        <tr><td>T-Bar Row</td><td class="center"><span class="sets-pill">3</span></td><td class="right">6–10</td></tr>
+        <tr><td>Lat Pulldown</td><td class="center"><span class="sets-pill">3</span></td><td class="right">8–12</td></tr>
+        <tr><td>Rope Pullover</td><td class="center"><span class="sets-pill">3</span></td><td class="right">12–15</td></tr>
+        <tr><td>Standing DB Curl</td><td class="center"><span class="sets-pill">3</span></td><td class="right">10–12</td></tr>
+        <tr><td>Reverse Pec Dec</td><td class="center"><span class="sets-pill">3</span></td><td class="right">12–15</td></tr>
+        <tr><td>Incline Curls</td><td class="center"><span class="sets-pill">3</span></td><td class="right">10–12</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Wednesday — Active Rest</div><div class="badge badge-green">Recovery · Movement Only</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Option</th><th style="text-align:right">What to Do</th></tr>
+        <tr><td>If going to gym</td><td class="right">30 min incline treadmill (incline 8 · speed 4–5) + 10k steps at home</td></tr>
+        <tr><td>If not going to gym</td><td class="right">15,000–18,000 steps at fast walking pace</td></tr>
+      </table>
+      <div class="note note-g" style="margin-bottom:0">No lifting. Active rest means movement, not intensity. This is recovery — use it properly.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Thursday — Push (Shoulder Focus)</div><div class="badge badge-red">Shoulders · Chest · Triceps</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Exercise</th><th style="text-align:center">Sets</th><th style="text-align:right">Reps</th></tr>
+        <tr><td>Shoulder DB Press</td><td class="center"><span class="sets-pill">3</span></td><td class="right">8–12</td></tr>
+        <tr><td>Lateral Raise (cable)</td><td class="center"><span class="sets-pill">4</span></td><td class="right">10–15</td></tr>
+        <tr><td>Incline DB Press</td><td class="center"><span class="sets-pill">3</span></td><td class="right">8–12</td></tr>
+        <tr><td>Pec Dec Fly</td><td class="center"><span class="sets-pill">3</span></td><td class="right">10–15</td></tr>
+        <tr><td>Overhead Tricep Extension</td><td class="center"><span class="sets-pill">3</span></td><td class="right">10–12</td></tr>
+        <tr><td>Tricep Pushdown (bar)</td><td class="center"><span class="sets-pill">3</span></td><td class="right">8–12</td></tr>
+      </table>
+      <div class="core-label">Core</div>
+      <table>
+        <tr><td>Rope Crunches</td><td class="center"><span class="sets-pill">3</span></td><td class="right">10–15</td></tr>
+        <tr><td>Lying Leg Raise</td><td class="center"><span class="sets-pill">3</span></td><td class="right">10–15</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Friday — Pull</div><div class="badge badge-blue">Back · Biceps · Rear Delts</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Exercise</th><th style="text-align:center">Sets</th><th style="text-align:right">Reps</th></tr>
+        <tr><td>Lat Pulldown</td><td class="center"><span class="sets-pill">3</span></td><td class="right">8–12</td></tr>
+        <tr><td>1 Arm DB Row</td><td class="center"><span class="sets-pill">3</span></td><td class="right">8–12</td></tr>
+        <tr><td>Seated Cable Row</td><td class="center"><span class="sets-pill">3</span></td><td class="right">8–12</td></tr>
+        <tr><td>EZ Bar Curl</td><td class="center"><span class="sets-pill">3</span></td><td class="right">8–12</td></tr>
+        <tr><td>Reverse Pec Dec</td><td class="center"><span class="sets-pill">3</span></td><td class="right">8–12</td></tr>
+        <tr><td>Preacher Curl</td><td class="center"><span class="sets-pill">3</span></td><td class="right">8–12</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Saturday — Legs</div><div class="badge badge-green">Quads · Hamstrings · Calves · Core</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Exercise</th><th style="text-align:center">Sets</th><th style="text-align:right">Reps</th></tr>
+        <tr><td>Leg Press</td><td class="center"><span class="sets-pill">3</span></td><td class="right">8–12</td></tr>
+        <tr><td>Goblet Squat</td><td class="center"><span class="sets-pill">3</span></td><td class="right">8–12</td></tr>
+        <tr><td>Hamstring Curls</td><td class="center"><span class="sets-pill">4</span></td><td class="right">8–12</td></tr>
+        <tr><td>Leg Extension</td><td class="center"><span class="sets-pill">3</span></td><td class="right">8–12</td></tr>
+        <tr><td>Calf Raises</td><td class="center"><span class="sets-pill">3</span></td><td class="right">8–12</td></tr>
+      </table>
+      <div class="core-label">Core</div>
+      <table><tr><td>Rope Crunches</td><td class="center"><span class="sets-pill">3</span></td><td class="right">10–15</td></tr></table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Sunday — Active Rest</div><div class="badge badge-green">Recovery</div></div>
+    <div class="card-body">
+      <p style="color:var(--muted2);font-size:13px">15,000–18,000 steps at fast walking pace. No gym. No lifting. Full recovery — movement only.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Deload — Every 8–10 Weeks</div><div class="badge badge-purple">Recovery Week</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Rule</th><th style="text-align:right">How</th></tr>
+        <tr><td>Reduce volume</td><td class="right">Drop sets by 40–50%</td></tr>
+        <tr><td>Reduce intensity</td><td class="right">Train 1–2 RIR easier than normal</td></tr>
+        <tr><td>Keep technique</td><td class="right">Same exercises · Same form · Lighter weight</td></tr>
+        <tr><td>Keep steps and cardio</td><td class="right">Do not cut these during deload</td></tr>
+        <tr><td>Keep diet</td><td class="right">Same food — deload is not a cheat week</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="note note-r"><strong>No running yet.</strong> At 115kg, running puts 3–4× bodyweight through knees. Incline walking burns similar calories with zero joint risk. Introduce after losing 15–20kg.</div>
+  <div class="note note-y"><strong>Progressive overload:</strong> When you hit the top of the rep range on every set with good form — increase weight by smallest increment next session.</div>
+</div>
+
+<!-- TRAINING TIPS -->
+<div id="training" class="section">
+  <div class="sec-head">
+    <div class="sec-title">Training Tips</div>
+    <div class="sec-sub">How to train · Not just what to do</div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-icon">📈</div>
+    <div class="tip-content">
+      <div class="tip-title">Progressive Overload — The Most Important Rule</div>
+      <div class="tip-desc">When you hit the <strong>top of the rep range on every set with good form</strong>, increase the weight by the smallest available increment next session. Example: Lat Pulldown 3×12 at 40kg → next session try 42.5kg. Without this, results stop.</div>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-icon">⬇️</div>
+    <div class="tip-content">
+      <div class="tip-title">Slow Negatives (Eccentric)</div>
+      <div class="tip-desc">The <strong>lowering phase of every rep should be controlled — 2–3 seconds down.</strong> The explosive phase is up. This applies to every exercise. Slow negatives cause more muscle damage and produce more growth. Never drop the weight or let gravity do the work.</div>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-icon">🎯</div>
+    <div class="tip-content">
+      <div class="tip-title">RIR — Reps in Reserve</div>
+      <div class="tip-desc"><strong>Compound lifts (squat, press, row, deadlift):</strong> Stop with 1–3 reps left in the tank. <strong>Isolation exercises (curls, raises, pushdowns):</strong> Stop with 0–2 reps left. Beginners often train either too easy or dangerously hard — RIR keeps intensity in the right zone.</div>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-icon">🔗</div>
+    <div class="tip-content">
+      <div class="tip-title">Mind-Muscle Connection</div>
+      <div class="tip-desc">On every isolation exercise — curls, raises, pushdowns — <strong>think about the muscle you are trying to work, not the weight.</strong> Before each set, squeeze the target muscle. During the rep, feel it contract. This is especially important as a beginner before heavy weights are possible.</div>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-icon">😤</div>
+    <div class="tip-content">
+      <div class="tip-title">Compound vs Isolation — Different Goals</div>
+      <div class="tip-desc"><strong>Compound lifts</strong> (bench, squat, row, press) — these build overall strength and burn the most calories. Go heavier, fewer reps (8–12). <strong>Isolation exercises</strong> (curls, lateral raises, pushdowns) — these shape specific muscles. Go lighter, more reps (12–15), feel the muscle work.</div>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-icon">⏱️</div>
+    <div class="tip-content">
+      <div class="tip-title">Rest Between Sets</div>
+      <div class="tip-desc"><strong>Compound lifts:</strong> 90 seconds minimum. <strong>Isolation exercises:</strong> 60 seconds. Resting too short reduces performance in the next set. Resting too long wastes time and reduces workout density. Use a timer.</div>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-icon">🏁</div>
+    <div class="tip-content">
+      <div class="tip-title">Warm Up Properly</div>
+      <div class="tip-desc">5 minutes incline treadmill before every session. Then for the first exercise of each muscle group — do 1 light warm-up set at 50% of working weight before your working sets. <strong>Never start a heavy compound cold.</strong> Joint injuries from skipping warm-up are common at his weight.</div>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-icon">📝</div>
+    <div class="tip-content">
+      <div class="tip-title">Track Every Session</div>
+      <div class="tip-desc">Phone notes — date, exercise, weight, reps for every set. <strong>The goal every session is to beat last week's numbers by even one rep or 2.5kg.</strong> Without tracking you cannot do this. Gut feeling is not reliable.</div>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-icon">😰</div>
+    <div class="tip-content">
+      <div class="tip-title">First 3 Weeks Will Be Brutal</div>
+      <div class="tip-desc">Severe muscle soreness (DOMS) is expected and normal. <strong>Do not skip sessions because of soreness</strong> — training through it with lighter weights actually speeds recovery. Soreness virtually disappears after week 3–4 as the body adapts.</div>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-icon">🚫</div>
+    <div class="tip-content">
+      <div class="tip-title">Form Before Weight — Always</div>
+      <div class="tip-desc"><strong>At 115kg, adding weight too fast to compound lifts is how injuries happen.</strong> If form breaks during a set — back is rounding on RDL, knees caving on squat — reduce weight immediately. Ego lifting at his weight leads to serious knee, back, and shoulder injuries that derail months of progress.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MILESTONES -->
+<div id="milestones" class="section">
+  <div class="sec-head">
+    <div class="sec-title">Monthly Milestones</div>
+    <div class="sec-sub">Track monthly · Not daily</div>
+  </div>
+
+  <div class="note note-y" style="margin-bottom:14px">Weigh every week, same day, same time, morning before eating. Use the <strong>7-day average</strong> — not single day readings. Judge progress monthly.</div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-month">Month 1</div>
+          <div class="tl-text"><strong>Target: 110–112kg (3–5kg loss expected)</strong><br>First month often higher due to water weight and glycogen loss. Build gym habit. Learn exercise forms. Soreness reduces by week 3. Replace cold coffee and stop skipping meals.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--blue)"></div>
+          <div class="tl-month">Month 2</div>
+          <div class="tl-text"><strong>Target: 107–109kg (2–4kg loss)</strong><br>Strength noticeably improving on all lifts. Sleep improving. Energy better. Face starting to look leaner.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--green)"></div>
+          <div class="tl-month">Month 3</div>
+          <div class="tl-text"><strong>Target: 104–106kg</strong><br>Face and arms visibly leaner. Clothes fitting differently. First calorie adjustment if needed based on 7-day average data.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--orange)"></div>
+          <div class="tl-month">Month 4</div>
+          <div class="tl-text"><strong>Target: 101–103kg</strong><br>Significant visual change. People notice. Upper body definition starting. Endurance markedly better.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--accent3)"></div>
+          <div class="tl-month">Month 5</div>
+          <div class="tl-text"><strong>🎉 Target: Under 100kg</strong><br>Major milestone. Upper body definition visible. Consider switching to PPL split if recovery and consistency are both solid.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--accent2)"></div>
+          <div class="tl-month">Month 6</div>
+          <div class="tl-text"><strong>Target: 96–98kg</strong><br>Halfway to goal. Blood work review. PPL split in place if ready. Training intensity increases.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--blue)"></div>
+          <div class="tl-month">Month 7–8</div>
+          <div class="tl-text"><strong>Target: 92–95kg</strong><br>Abs starting to outline under reduced fat. Clearly athletic build. Significant muscle development visible.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--green)"></div>
+          <div class="tl-month">Month 9–10</div>
+          <div class="tl-text"><strong>Target: 88–91kg</strong><br>Visible muscle definition under reduced fat. Clearly athletic. Third blood work review.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--accent3)"></div>
+          <div class="tl-month">Month 11–14</div>
+          <div class="tl-text"><strong>🏆 Target: 85kg — Phase 1 Complete</strong><br>Begin Phase 2 recomposition. This is where the real aesthetic physique work begins.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Realistic Timeline</div><div class="badge badge-yellow">Honest</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Milestone</th><th style="text-align:right">Time</th></tr>
+        <tr><td>Feel noticeably better, more energy</td><td class="right">2–3 weeks</td></tr>
+        <tr><td>First visible changes (face, arms)</td><td class="right">4–6 weeks</td></tr>
+        <tr><td>Clothes fitting differently</td><td class="right">2–3 months</td></tr>
+        <tr><td>Under 100kg</td><td class="right">5–6 months</td></tr>
+        <tr><td>Reach 85kg</td><td class="right">9–14 months</td></tr>
+        <tr><td>Aesthetic physique with definition</td><td class="right">18–24 months total</td></tr>
+      </table>
+      <div class="note note-r" style="margin-bottom:0"><strong>Month 1 is always the biggest drop</strong> due to water and glycogen loss. After that expect 2–4kg per month with good adherence. Do not expect month 1 rate to continue — it will not.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TRACKING -->
+<div id="tracking" class="section">
+  <div class="sec-head">
+    <div class="sec-title">Progress Tracking</div>
+    <div class="sec-sub">Habits predict success · Not just scale weight</div>
+  </div>
+
+  <div class="note note-b" style="margin-bottom:14px">Scale weight is one metric. Habits are more predictive of long-term success. Track both.</div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Daily Habit Tracker</div><div class="badge badge-accent">Every Day</div></div>
+    <div class="card-body">
+      <div class="track-grid">
+        <div class="track-item"><span class="track-label">Workout completed</span><span class="track-target">Yes / No</span></div>
+        <div class="track-item"><span class="track-label">Daily steps</span><span class="track-target">8,000–10,000</span></div>
+        <div class="track-item"><span class="track-label">Sleep hours</span><span class="track-target">7–8 hrs</span></div>
+        <div class="track-item"><span class="track-label">Protein target hit</span><span class="track-target">150–170g</span></div>
+        <div class="track-item"><span class="track-label">Water intake</span><span class="track-target">4L+</span></div>
+        <div class="track-item"><span class="track-label">Meals eaten (no skipping)</span><span class="track-target">3 meals</span></div>
+        <div class="track-item"><span class="track-label">No sugar / junk</span><span class="track-target">Yes / No</span></div>
+        <div class="track-item"><span class="track-label">Vegetables eaten</span><span class="track-target">400g+</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Weekly Measurements</div><div class="badge badge-yellow">Every Sunday Morning</div></div>
+    <div class="card-body">
+      <div class="track-grid">
+        <div class="track-item"><span class="track-label">Scale weight</span><span class="track-target">Same time · After toilet · Before eating</span></div>
+        <div class="track-item"><span class="track-label">7-day average weight</span><span class="track-target">Add 7 days ÷ 7</span></div>
+        <div class="track-item"><span class="track-label">Waist circumference</span><span class="track-target">At navel level</span></div>
+        <div class="track-item"><span class="track-label">Progress photo</span><span class="track-target">Same lighting · Same pose · Front and side</span></div>
+        <div class="track-item"><span class="track-label">Workout adherence %</span><span class="track-target">Sessions done ÷ sessions planned</span></div>
+      </div>
+      <div class="note note-g" style="margin-top:12px;margin-bottom:0"><strong>Use 7-day average weight, not single-day readings.</strong> Daily weight fluctuates 1–2kg from water, food, and sodium. The weekly average gives the real trend.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Monthly Review</div><div class="badge badge-purple">End of Every Month</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Review Point</th><th style="text-align:right">What to Check</th></tr>
+        <tr><td>Average weekly weight trend</td><td class="right">Losing 2–4kg/month?</td></tr>
+        <tr><td>Waist circumference change</td><td class="right">Decreasing?</td></tr>
+        <tr><td>Strength progression</td><td class="right">All lifts going up?</td></tr>
+        <tr><td>Habit completion rate</td><td class="right">Above 80%?</td></tr>
+        <tr><td>Sleep average</td><td class="right">Improving toward 12AM?</td></tr>
+        <tr><td>Energy and recovery</td><td class="right">Feeling better than last month?</td></tr>
+      </table>
+      <div class="note note-b" style="margin-bottom:0">If 3 or more of these are moving in the right direction — the plan is working. Do not change anything. If 3 or more are stalled — review the plateau protocol tab.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PLATEAU -->
+<div id="plateau" class="section">
+  <div class="sec-head">
+    <div class="sec-title">Plateau Protocol</div>
+    <div class="sec-sub">What to do when progress stalls</div>
+  </div>
+
+  <div class="note note-y" style="margin-bottom:14px">Before declaring a plateau — confirm adherence is actually consistent. Most "plateaus" are caused by inconsistent tracking or hidden calories, not metabolic adaptation.</div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Calorie Adjustment Decision Tree</div><div class="badge badge-accent">Every 2–3 Weeks</div></div>
+    <div class="card-body">
+      <div class="decision-tree">
+        <div class="dt-item">
+          <div class="dt-icon" style="color:var(--green)">✅</div>
+          <div class="dt-content">
+            <div class="dt-cond">Losing 0.5–1% of bodyweight per week</div>
+            <div class="dt-action"><strong>Do nothing.</strong> Plan is working. Do not adjust. At 115kg this means 0.5–1.1kg per week — this is the target zone.</div>
+          </div>
+        </div>
+        <div class="dt-item">
+          <div class="dt-icon" style="color:var(--accent2)">⚠️</div>
+          <div class="dt-content">
+            <div class="dt-cond">Losing too fast — more than 1% for several weeks</div>
+            <div class="dt-action"><strong>Add 100–200 kcal per day.</strong> Too fast means muscle loss. Add carbs first — extra rice or oats portion. Do not add junk food.</div>
+          </div>
+        </div>
+        <div class="dt-item">
+          <div class="dt-icon" style="color:var(--red)">🛑</div>
+          <div class="dt-content">
+            <div class="dt-cond">Plateau — no change in 7-day average for 2 consecutive weeks with confirmed good adherence</div>
+            <div class="dt-action"><strong>Option A:</strong> Reduce calories by 100–150 kcal/day (remove one small carb portion). <strong>Option B:</strong> Add 20 minutes of weekly walking. Start with Option A first. Only do one change at a time.</div>
+          </div>
+        </div>
+        <div class="dt-item">
+          <div class="dt-icon" style="color:var(--blue)">📋</div>
+          <div class="dt-content">
+            <div class="dt-cond">Before blaming the plan — check adherence first</div>
+            <div class="dt-action">Was protein hit every day? Were meals skipped? Was cold coffee with sugar still happening? Were workouts consistent? <strong>Most plateaus are adherence problems not metabolic ones.</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Calorie Adjustment History</div><div class="badge badge-yellow">Track Changes</div></div>
+    <div class="card-body">
+      <table>
+        <tr><th>Date</th><th>Previous Calories</th><th>New Calories</th><th style="text-align:right">Reason</th></tr>
+        <tr><td>Start</td><td>—</td><td>2500 kcal</td><td class="right">Starting point</td></tr>
+        <tr><td style="color:var(--muted)">Month 1 review</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">TBD</td><td class="right" style="color:var(--muted)">Based on data</td></tr>
+        <tr><td style="color:var(--muted)">Month 2 review</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">TBD</td><td class="right" style="color:var(--muted)">Based on data</td></tr>
+        <tr><td style="color:var(--muted)">Month 3 review</td><td style="color:var(--muted)">—</td><td style="color:var(--muted)">TBD</td><td class="right" style="color:var(--muted)">Based on data</td></tr>
+      </table>
+      <div class="note note-b" style="margin-bottom:0">Fill this in every review. Data-driven adjustments only — not guesses.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">Never Do These When Stuck</div><div class="badge badge-red">Common Mistakes</div></div>
+    <div class="card-body">
+      <div class="rules-grid">
+        <div class="rule-item"><div class="rule-num">✗</div><div class="rule-content"><div class="rule-title">Do not drop below 1800 kcal</div><div class="rule-desc">Especially with thyroid family history. Too aggressive causes muscle loss and metabolic adaptation that makes future fat loss harder.</div></div></div>
+        <div class="rule-item"><div class="rule-num">✗</div><div class="rule-content"><div class="rule-title">Do not dramatically increase cardio</div><div class="rule-desc">Adding hours of cardio causes fatigue, increases hunger, and eats muscle. Small increments only — 20 minutes per week maximum increase.</div></div></div>
+        <div class="rule-item"><div class="rule-num">✗</div><div class="rule-content"><div class="rule-title">Do not change multiple things at once</div><div class="rule-desc">Change one variable at a time — either calories or cardio, never both simultaneously. Otherwise you cannot tell which change caused which result.</div></div></div>
+        <div class="rule-item"><div class="rule-num">✗</div><div class="rule-content"><div class="rule-title">Do not declare a plateau after one week</div><div class="rule-desc">A true plateau is 2 consecutive weeks of no movement in the 7-day average with confirmed adherence. One week of stalled weight is normal fluctuation.</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUPPLEMENTS -->
+<div id="supplements" class="section">
+  <div class="sec-head">
+    <div class="sec-title">Supplements</div>
+    <div class="sec-sub">Only what is necessary · Age appropriate · Conservative</div>
+  </div>
+
+  <div class="note note-y" style="margin-bottom:14px"><strong>Supplement priority order:</strong> Food first → Sleep → Training → Whey if needed → Creatine only after doctor and parent approval.</div>
+
+  <div class="card">
+    <div class="card-body">
+      <table>
+        <tr><th>Supplement</th><th style="text-align:center">Status</th><th style="text-align:right">Dosage & Notes</th></tr>
+        <tr><td>Whey Protein</td><td class="center"><span style="color:var(--accent3);font-family:'DM Mono',monospace;font-size:11px">⚡ Optional</span></td><td class="right">1 scoop post-workout · Only if food protein falls short</td></tr>
+        <tr><td>Multivitamin</td><td class="center"><span style="color:var(--accent3);font-family:'DM Mono',monospace;font-size:11px">⚡ Optional</span></td><td class="right">1 daily with meal · If diet variety is limited</td></tr>
+        <tr><td>Vitamin D3</td><td class="center"><span class="supp-yes">✅ Yes</span></td><td class="right">1000–2000 IU daily · Most Indians deficient</td></tr>
+        <tr><td>Omega 3 (Fish oil)</td><td class="center"><span class="supp-yes">✅ Yes</span></td><td class="right">1g daily with food · Supports insulin sensitivity</td></tr>
+        <tr><td>Creatine</td><td class="center"><span style="color:var(--accent3);font-family:'DM Mono',monospace;font-size:11px">⚡ Optional</span></td><td class="right">After parent + doctor approval · Not routine at 16</td></tr>
+        <tr><td>Fat burners</td><td class="center"><span class="supp-no">❌ Never</span></td><td class="right">Thyroid family history makes these dangerous</td></tr>
+        <tr><td>Pre-workout</td><td class="center"><span class="supp-no">❌ No</span></td><td class="right">Too stimulant-heavy at 16</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="note note-g"><strong>Omega 3:</strong> Directly supports insulin sensitivity — especially important given diabetes family history. Anti-inflammatory, aids recovery.</div>
+  <div class="note note-b"><strong>Vitamin D3:</strong> Important for metabolism, muscle function, immune health. Most Indians are deficient regardless of sun exposure.</div>
+  <div class="note note-r"><strong>On creatine:</strong> Evidence supports adolescent use in supervised resistance training, but given his age, health flags, and pending kidney results — food, sleep, and training must come first. Revisit with a doctor when kidney results are clear.</div>
+</div>
+
+<!-- RULES -->
+<div id="rules" class="section">
+  <div class="sec-head">
+    <div class="sec-title">Rules to Keep</div>
+    <div class="sec-sub">Daily non-negotiables · Health monitoring</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head"><div class="card-title">Daily Non-Negotiables</div><div class="badge badge-red">Every Day</div></div>
+    <div class="card-body">
+      <div class="rules-grid">
+        <div class="rule-item"><div class="rule-num">1</div><div class="rule-content"><div class="rule-title">Eat breakfast every day — no skipping</div><div class="rule-desc">Skipping meals then eating heavy at night is the pattern that caused the weight gain. Three consistent meals fixes this.</div></div></div>
+        <div class="rule-item"><div class="rule-num">2</div><div class="rule-content"><div class="rule-title">Hit protein target every day</div><div class="rule-desc">150–170g pending doctor clearance. Protein prevents muscle loss during the long cut.</div></div></div>
+        <div class="rule-item"><div class="rule-num">3</div><div class="rule-content"><div class="rule-title">Replace cold coffee with black coffee or green tea</div><div class="rule-desc">Liquid sugar during study repeatedly spikes insulin. Diabetes family history makes this non-negotiable.</div></div></div>
+        <div class="rule-item"><div class="rule-num">4</div><div class="rule-content"><div class="rule-title">4 litres water daily</div><div class="rule-desc">Critical for kidney health given elevated blood protein levels. Start with 500ml immediately on waking.</div></div></div>
+        <div class="rule-item"><div class="rule-num">5</div><div class="rule-content"><div class="rule-title">8,000–10,000 steps daily</div><div class="rule-desc">Including rest days. Passive calorie burn that compounds over 10–14 months.</div></div></div>
+        <div class="rule-item"><div class="rule-num">6</div><div class="rule-content"><div class="rule-title">Follow sleep transition plan</div><div class="rule-desc">Move sleep 15 minutes earlier each week. Growth hormone at 16 is released during deep sleep — this directly affects fat loss and recovery.</div></div></div>
+        <div class="rule-item"><div class="rule-num">7</div><div class="rule-content"><div class="rule-title">No sugar, fried food, or packaged snacks</div><div class="rule-desc">Not just empty calories — active health risks given diabetes family history.</div></div></div>
+        <div class="rule-item"><div class="rule-num">8</div><div class="rule-content"><div class="rule-title">Track every gym session</div><div class="rule-desc">Date, exercise, weight, reps. Progressive overload requires knowing last week's numbers.</div></div></div>
+        <div class="rule-item"><div class="rule-num">9</div><div class="rule-content"><div class="rule-title">Blood work every 3 months</div><div class="rule-desc">Thyroid panel · Fasting blood glucose · HbA1c · Kidney function · Blood pressure · Waist circumference.</div></div></div>
+        <div class="rule-item"><div class="rule-num">10</div><div class="rule-content"><div class="rule-title">Weigh weekly using 7-day average</div><div class="rule-desc">Same day, same time, morning. Average 7 days. Do not judge progress on single-day readings.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">When to Switch to PPL Split</div><div class="badge badge-green">Month 5–6</div></div>
+    <div class="card-body">
+      <div class="rules-grid">
+        <div class="rule-item"><div class="rule-num">→</div><div class="rule-content"><div class="rule-title">Weight around 95–100kg</div><div class="rule-desc">Significantly reduced joint load makes higher intensity training safer.</div></div></div>
+        <div class="rule-item"><div class="rule-num">→</div><div class="rule-content"><div class="rule-title">All exercise forms solid</div><div class="rule-desc">Every movement is second nature. No thinking about form during sets.</div></div></div>
+        <div class="rule-item"><div class="rule-num">→</div><div class="rule-content"><div class="rule-title">No missed sessions for 8 weeks</div><div class="rule-desc">Gym habit fully established and consistent.</div></div></div>
+        <div class="rule-item"><div class="rule-num">→</div><div class="rule-content"><div class="rule-title">Strength significantly up from start</div><div class="rule-desc">All major lifts at least doubled from starting weights.</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- COACH NOTES -->
+<div id="coachnotes" class="section">
+  <div class="sec-head">
+    <div class="sec-title">From Your Coach</div>
+    <div class="sec-sub">The things that actually matter · Read this first</div>
+  </div>
+
+  <div class="tip-card" style="border-left:3px solid var(--accent)">
+    <div class="tip-icon">🔱</div>
+    <div class="tip-content">
+      <div class="tip-title">1 — Discipline, Consistency, Drive</div>
+      <div class="tip-desc">These are the three secret sauces. No supplement, no program, no coach can replace them. <strong>Motivation gets you started. Discipline keeps you going when motivation disappears.</strong> And it will disappear. That is when the real work begins. Show up anyway.</div>
+    </div>
+  </div>
+
+  <div class="tip-card" style="border-left:3px solid var(--accent)">
+    <div class="tip-icon">📊</div>
+    <div class="tip-content">
+      <div class="tip-title">2 — Numbers Don't Lie</div>
+      <div class="tip-desc">Track your workouts. Track your sleep. Track your food. <strong>You will know exactly what happened last time, what is going to happen today, and what will happen later.</strong> Gut feeling is not data. Data is data. The people who track are the people who progress.</div>
+    </div>
+  </div>
+
+  <div class="tip-card" style="border-left:3px solid var(--accent)">
+    <div class="tip-icon">🎧</div>
+    <div class="tip-content">
+      <div class="tip-title">3 — Learn to Train Without Music and Without Caffeine</div>
+      <div class="tip-desc">This one is controversial. But <strong>if you can only train well with music and pre-workout, you are dependent on external stimulation to perform.</strong> Train without them sometimes. Build the internal drive. When you can push hard in silence on an empty stomach — that is real mental strength. The music and coffee become a bonus, not a requirement.</div>
+    </div>
+  </div>
+
+  <div class="tip-card" style="border-left:3px solid var(--accent)">
+    <div class="tip-icon">💪</div>
+    <div class="tip-content">
+      <div class="tip-title">4 — A Bad Workout Is Better Than a Skipped Workout</div>
+      <div class="tip-desc">This is the most important one. <strong>You will have days where you are tired, unmotivated, sore, and drained. Go anyway.</strong> A half-effort session still builds the habit. Still sends the signal to your body. Still beats staying home. Missing one session makes missing the next one easier. Showing up makes showing up easier.</div>
+    </div>
+  </div>
+
+  <div class="tip-card" style="border-left:3px solid var(--accent)">
+    <div class="tip-icon">🌱</div>
+    <div class="tip-content">
+      <div class="tip-title">5 — Trust the Process and Keep It Sustainable</div>
+      <div class="tip-desc"><strong>The more you trust the process and the more you keep everything sustainable, the more progress you are going to make.</strong> Extreme diets and extreme training produce extreme burnout. This plan is built for the long game — 10 to 14 months of consistent work that compounds into a completely different body and life.</div>
+    </div>
+  </div>
+
+  <div class="tip-card" style="border-left:3px solid var(--green)">
+    <div class="tip-icon">🪞</div>
+    <div class="tip-content">
+      <div class="tip-title">6 — Stop Comparing. Start Competing With Yourself.</div>
+      <div class="tip-desc">Social media is a highlight reel. The person you see with the shredded physique has been training for years, not months. <strong>Your only competition is who you were last week.</strong> Did you lift more? Sleep better? Eat cleaner? That is the only comparison that matters.</div>
+    </div>
+  </div>
+
+  <div class="tip-card" style="border-left:3px solid var(--green)">
+    <div class="tip-icon">🍽️</div>
+    <div class="tip-content">
+      <div class="tip-title">7 — Food Is Fuel, Not a Reward or Punishment</div>
+      <div class="tip-desc">You are not eating clean to punish yourself for being overweight. You are not rewarding yourself with junk food after a good session. <strong>Food is information your body uses to recover, build muscle, and burn fat.</strong> Change the relationship with food and everything else becomes easier.</div>
+    </div>
+  </div>
+
+  <div class="tip-card" style="border-left:3px solid var(--green)">
+    <div class="tip-icon">📸</div>
+    <div class="tip-content">
+      <div class="tip-title">8 — Take Progress Photos, Not Just Scale Readings</div>
+      <div class="tip-desc">The scale will lie to you regularly. Water retention, muscle gain, and food timing all affect it daily. <strong>A photo every 4 weeks in the same lighting and pose tells the real story.</strong> Most people who quit do so because they only watched the scale. The people who stay do so because they can see what is actually changing.</div>
+    </div>
+  </div>
+
+  <div class="tip-card" style="border-left:3px solid var(--green)">
+    <div class="tip-icon">😴</div>
+    <div class="tip-content">
+      <div class="tip-title">9 — Sleep Is the Most Underrated Tool in This Plan</div>
+      <div class="tip-desc">You do not grow in the gym. <strong>You grow when you sleep.</strong> Growth hormone is released during deep sleep — at 16, this is at its lifetime peak. Every hour of sleep you cut is a direct reduction in how much fat you lose and how much muscle you build. Protect your sleep like you protect your training.</div>
+    </div>
+  </div>
+
+  <div style="background:var(--surface2);border:1px solid rgba(0,212,255,0.2);border-radius:6px;padding:20px;margin-top:6px;text-align:center">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--accent);margin-bottom:8px">Happy Gains To You, My Friend 🏆</div>
+    <div style="font-size:13px;color:var(--muted2);line-height:1.7">This plan is everything you need. The only variable left is you.<br>Show up. Track everything. Trust the process. See you on the other side.</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
